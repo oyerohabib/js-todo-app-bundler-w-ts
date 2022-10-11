@@ -1,11 +1,56 @@
-/**
- * This file is just a silly example to show everything working in the browser.
- * When you're ready to start on your site, clear the file. Happy hacking!
- **/
+import { v4 as uuidV4 } from "uuid";
 
-import confetti from 'canvas-confetti';
+type Task = {
+  id: string;
+  title: any;
+  isCompleted: boolean;
+  createdAt: Date;
+};
 
-confetti.create(document.getElementById('canvas') as HTMLCanvasElement, {
-  resize: true,
-  useWorker: true,
-})({ particleCount: 200, spread: 200 });
+const todoItems = document.querySelector<HTMLUListElement>("#list-item");
+const todoForm = document.getElementById("todo-form") as HTMLFormElement | null;
+const todoTitle = document.querySelector<HTMLInputElement>("#todo-title");
+
+const saveTasks = () => {
+  localStorage.setItem("TASKS", JSON.stringify(tasks));
+};
+
+const loadTasks = (): Task[] => {
+  const tasksJSON = localStorage.getItem("TASKS");
+  if (tasksJSON === null) return [];
+  return JSON.parse(tasksJSON);
+};
+
+const tasks: Task[] = loadTasks();
+
+todoForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (todoTitle?.value === "" || todoTitle?.value === null) return;
+  const newTodo: Task = {
+    id: uuidV4(),
+    title: todoTitle?.value,
+    isCompleted: false,
+    createdAt: new Date(),
+  };
+  addTodoItem(newTodo);
+  tasks.push(newTodo);
+  saveTasks();
+  if (todoTitle?.value) todoTitle.value = "";
+});
+
+const addTodoItem = (todo: Task) => {
+  const item = document.createElement("li");
+  const label = document.createElement("label");
+  const checkbox = document.createElement("input");
+  checkbox.addEventListener("change", () => {
+    todo.isCompleted = checkbox.checked;
+    saveTasks();
+  });
+  checkbox.type = "checkbox";
+  checkbox.checked = todo.isCompleted;
+  label.append(checkbox, todo.title);
+  item.append(label);
+  todoItems?.append(item);
+};
+
+tasks.forEach(addTodoItem);
