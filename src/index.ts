@@ -2,7 +2,7 @@ import { v4 as uuidV4 } from "uuid";
 
 type Task = {
   id: string;
-  title: any;
+  title: string;
   isCompleted: boolean;
   createdAt: Date;
 };
@@ -26,15 +26,17 @@ const tasks: Task[] = loadTasks();
 todoForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   if (todoTitle?.value === "" || todoTitle?.value === null) return;
-  const newTodo: Task = {
-    id: uuidV4(),
-    title: todoTitle?.value,
-    isCompleted: false,
-    createdAt: new Date(),
-  };
-  addTodoItem(newTodo);
-  tasks.push(newTodo);
-  saveTasks();
+  if (todoTitle?.value) {
+    const newTodo: Task = {
+      id: uuidV4(),
+      title: todoTitle?.value,
+      isCompleted: false,
+      createdAt: new Date(),
+    };
+    addTodoItem(newTodo);
+    tasks.push(newTodo);
+    saveTasks();
+  }
   if (todoTitle?.value) todoTitle.value = "";
 });
 
